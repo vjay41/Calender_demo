@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Define the project path
+PROJECT_DIR="/path/to/smarts_telemetry" # Change this to the actual project path
+DEST_DIR="/home/smarts/smarts_telemetry"
+
+# Specify Python version requirement
+REQUIRED_PYTHON="/usr/bin/python3.12"
+REQUIRED_VERSION="3.12"
+
+# Check if /usr/bin/python3.12 exists
+if [[ ! -f "$REQUIRED_PYTHON" ]]; then
+  echo "Python 3.12 is not installed at $REQUIRED_PYTHON."
+  exit 1
+fi
+
+# Check Python version
+PYTHON_VERSION=$($REQUIRED_PYTHON --version 2>&1 | awk '{print $2}')
+if [[ $(echo "$PYTHON_VERSION >= $REQUIRED_VERSION" | bc -l) -ne 1 ]]; then
+  echo "Python version is less than $REQUIRED_VERSION. Found version: $PYTHON_VERSION"
+  exit 1
+fi
+
+echo "Python version $PYTHON_VERSION is valid."
+
+# Navigate to the project directory
+cd "$PROJECT_DIR" || { echo "Project directory not found"; exit 1; }
+
+# Check if pyproject.toml exists
+if [[ ! -f "pyproject.toml" ]]; then
+  echo "pyproject.toml not found!"
+  exit 1
+fi
+
+# Install Poetry if it's not installed
+if ! command -v poetry &> /dev/null; then
+  echo "Poetry is not installed. Installing Poetry..."
+  curl -sSL https://install.python-poetry.org | $REQUIRED_PYTHON -
+  export PATH="$HOME/.local/bin:$PATH"
+fi
+
+# Ensure Poetry is using the correct Python version
+poetry env use "$REQUIRED_PYTHON"
+
+# Install dependencies and create the virtual environment
+poetry install
+
+# Check if installation was successful
+if [[ $? -ne 0 ]]; then
+  echo "Failed to create the virtual environment."
+  exit 1
+fi
+
+# Copy the SRC folder to the destination
+if [[ -d "${PROJECT_DIR}/SRC" ]]; then
+  mkdir -p "$DEST_DIR"
+  cp -r "${PROJECT_DIR}/SRC" "$DEST_DIR"
+  echo "SRC folder successfully copied to $DEST_DIR."
+else
+  echo "SRC folder not found!"
+fi
