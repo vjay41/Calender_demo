@@ -1,61 +1,49 @@
-#!/bin/bash
+import pytest
+import psutil
+from unittest.mock import patch, Mock
+from your_module import already_running  # Replace 'your_module' with the actual module name
 
-# Define the project path
-PROJECT_DIR="/path/to/smarts_telemetry" # Change this to the actual project path
-DEST_DIR="/home/smarts/smarts_telemetry"
+@pytest.fixture
+def mock_process_iter():
+    """Fixture to mock psutil.process_iter for testing."""
+    def _mock_process_iter(mocked_processes):
+        # Patch psutil.process_iter to return the mocked processes
+        with patch('psutil.process_iter', return_value=mocked_processes):
+            yield
+    return _mock_process_iter
 
-# Specify Python version requirement
-REQUIRED_PYTHON="/usr/bin/python3.12"
-REQUIRED_VERSION="3.12"
+def test_already_running_found(mock_process_iter):
+    # Mock a process that includes the command line argument
+    mocked_process = Mock()
+    mocked_process.info = {'pid': 1234, 'cmdline': ['python', 'script.py']}
+    
+    # Use the fixture to simulate the process list
+    with mock_process_iter([mocked_process]):
+        assert already_running('script.py') is True
 
-# Check if /usr/bin/python3.12 exists
-if [[ ! -f "$REQUIRED_PYTHON" ]]; then
-  echo "Python 3.12 is not installed at $REQUIRED_PYTHON."
-  exit 1
-fi
+def test_already_running_not_found(mock_process_iter):
+    # Mock a process that does NOT include the command line argument
+    mocked_process = Mock()
+    mocked_process.info = {'pid': 5678, 'cmdline': ['python', 'another_script.py']}
+    
+    # Use the fixture to simulate the process list
+    with mock_process_iter([mocked_process]):
+        assert already_running('non_existent_script.py') is False
 
-# Check Python version
-PYTHON_VERSION=$($REQUIRED_PYTHON --version 2>&1 | awk '{print $2}')
-if [[ $(echo "$PYTHON_VERSION >= $REQUIRED_VERSION" | bc -l) -ne 1 ]]; then
-  echo "Python version is less than $REQUIRED_VERSION. Found version: $PYTHON_VERSION"
-  exit 1
-fi
+def test_already_running_empty_cmdline(mock_process_iter):
+    # Mock a process with an empty cmdline (which can occur in some cases)
+    mocked_process = Mock()
+    mocked_process.info = {'pid': 9999, 'cmdline': []}
+    
+    # Use the fixture to simulate the process list
+    with mock_process_iter([mocked_process]):
+        assert already_running('script.py') is False
 
-echo "Python version $PYTHON_VERSION is valid."
-
-# Navigate to the project directory
-cd "$PROJECT_DIR" || { echo "Project directory not found"; exit 1; }
-
-# Check if pyproject.toml exists
-if [[ ! -f "pyproject.toml" ]]; then
-  echo "pyproject.toml not found!"
-  exit 1
-fi
-
-# Install Poetry if it's not installed
-if ! command -v poetry &> /dev/null; then
-  echo "Poetry is not installed. Installing Poetry..."
-  curl -sSL https://install.python-poetry.org | $REQUIRED_PYTHON -
-  export PATH="$HOME/.local/bin:$PATH"
-fi
-
-# Ensure Poetry is using the correct Python version
-poetry env use "$REQUIRED_PYTHON"
-
-# Install dependencies and create the virtual environment
-poetry install
-
-# Check if installation was successful
-if [[ $? -ne 0 ]]; then
-  echo "Failed to create the virtual environment."
-  exit 1
-fi
-
-# Copy the SRC folder to the destination
-if [[ -d "${PROJECT_DIR}/SRC" ]]; then
-  mkdir -p "$DEST_DIR"
-  cp -r "${PROJECT_DIR}/SRC" "$DEST_DIR"
-  echo "SRC folder successfully copied to $DEST_DIR."
-else
-  echo "SRC folder not found!"
-fi
+def test_already_running_access_denied(mock_process_iter):
+    # Mock a process that raises AccessDenied exception
+    mocked_process = Mock()
+    mocked_process.info = {'pid': 8888, 'cmdline': ['restricted_process']}
+    
+    # Raise an AccessDenied exception during the iteration
+    with patch('psutil.process_iter', side_effect=psutil.AccessDenied):
+        assert already_running('restricted_process') is False
