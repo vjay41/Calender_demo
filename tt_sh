@@ -1,49 +1,15 @@
-import pytest
-import psutil
-from unittest.mock import patch, Mock
-from your_module import already_running  # Replace 'your_module' with the actual module name
+A development goal is a specific objective aimed at improving your skills, knowledge, or career growth. Here’s an example:
 
-@pytest.fixture
-def mock_process_iter():
-    """Fixture to mock psutil.process_iter for testing."""
-    def _mock_process_iter(mocked_processes):
-        # Patch psutil.process_iter to return the mocked processes
-        with patch('psutil.process_iter', return_value=mocked_processes):
-            yield
-    return _mock_process_iter
+Goal: Improve Python Programming Skills
 
-def test_already_running_found(mock_process_iter):
-    # Mock a process that includes the command line argument
-    mocked_process = Mock()
-    mocked_process.info = {'pid': 1234, 'cmdline': ['python', 'script.py']}
-    
-    # Use the fixture to simulate the process list
-    with mock_process_iter([mocked_process]):
-        assert already_running('script.py') is True
-
-def test_already_running_not_found(mock_process_iter):
-    # Mock a process that does NOT include the command line argument
-    mocked_process = Mock()
-    mocked_process.info = {'pid': 5678, 'cmdline': ['python', 'another_script.py']}
-    
-    # Use the fixture to simulate the process list
-    with mock_process_iter([mocked_process]):
-        assert already_running('non_existent_script.py') is False
-
-def test_already_running_empty_cmdline(mock_process_iter):
-    # Mock a process with an empty cmdline (which can occur in some cases)
-    mocked_process = Mock()
-    mocked_process.info = {'pid': 9999, 'cmdline': []}
-    
-    # Use the fixture to simulate the process list
-    with mock_process_iter([mocked_process]):
-        assert already_running('script.py') is False
-
-def test_already_running_access_denied(mock_process_iter):
-    # Mock a process that raises AccessDenied exception
-    mocked_process = Mock()
-    mocked_process.info = {'pid': 8888, 'cmdline': ['restricted_process']}
-    
-    # Raise an AccessDenied exception during the iteration
-    with patch('psutil.process_iter', side_effect=psutil.AccessDenied):
-        assert already_running('restricted_process') is False
+Objective: Enhance proficiency in Python by focusing on advanced concepts and frameworks for automation and data analysis.
+Action Plan:
+Complete an online course on advanced Python techniques (e.g., data manipulation with Pandas, automation with Selenium) within 3 months.
+Contribute to an open-source Python project or start a personal project related to data processing or web scraping.
+Regularly practice coding by solving problems on platforms like LeetCode or HackerRank, dedicating at least 2 hours per week.
+Seek feedback on code quality from peers or mentors, and implement suggested improvements.
+Measurement:
+Successfully complete at least one course and obtain a certification.
+Achieve 10 problem solutions on LeetCode by the end of the quarter.
+Gain experience by contributing at least 3 pull requests to an open-source project.
+Timeline: 6 months.
