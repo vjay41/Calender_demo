@@ -13,3 +13,28 @@ Successfully complete at least one course and obtain a certification.
 Achieve 10 problem solutions on LeetCode by the end of the quarter.
 Gain experience by contributing at least 3 pull requests to an open-source project.
 Timeline: 6 months.
+
+
+Here’s an example of a development goal focused on Site Reliability Engineering (SRE) foundation:
+
+Goal: Build a Strong Foundation in Site Reliability Engineering (SRE)
+
+Objective: Gain a thorough understanding of SRE principles and practices, including monitoring, automation, incident response, and system reliability, to improve the ability to maintain and optimize large-scale systems.
+
+Action Plan:
+
+Complete an SRE fundamentals course (e.g., Google SRE course, Udacity's SRE Nanodegree) within the next 3 months.
+Read the "Site Reliability Engineering" book by Google and "The Site Reliability Workbook" within 6 months.
+Implement a personal or team project that incorporates SRE practices, such as setting up monitoring and alerting with Prometheus and Grafana or automating incident response workflows.
+Shadow experienced SREs during incident response and postmortems to understand the process better, aiming for at least 4 sessions in the next 3 months.
+Join an SRE community or forum (e.g., SRECon, LinkedIn groups) and participate in discussions to gain insights from industry experts.
+Measurement:
+
+Complete at least one SRE-related course with a certificate.
+Finish reading the two recommended books and document key learnings.
+Implement monitoring and alerting for a sample system, with dashboards and automated alerts.
+Participate in at least 4 incident response or postmortem sessions and provide a written summary of what was learned.
+Share one case study or blog post about the SRE journey within the organization or on a public forum.
+Timeline: 6-12 months.
+
+This goal aligns with building a solid foundation in SRE, focusing on practical skills and real-world applications, while also being specific, measurable, and time-bound.
